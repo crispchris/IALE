@@ -2,6 +2,17 @@
 
 You can find the preprint here: https://arxiv.org/abs/2007.04637
 
+```
+@misc{lffler2020iale,
+    title={IALE: Imitating Active Learner Ensembles},
+    author={Christoffer Löffler and Karthik Ayyalasomayajula and Sascha Riechel and Christopher Mutschler},
+    year={2020},
+    eprint={2007.04637},
+    archivePrefix={arXiv},
+    primaryClass={cs.LG}
+}
+
+
 # Install dependencies
 ```
 conda env create -f py37_environment.yml
