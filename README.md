@@ -11,7 +11,7 @@ You can find the preprint here: https://arxiv.org/abs/2007.04637
     archivePrefix={arXiv},
     primaryClass={cs.LG}
 }
-
+```
 
 # Install dependencies
 ```
