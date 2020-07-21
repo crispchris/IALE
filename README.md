@@ -1,3 +1,7 @@
+# Publication
+
+You can find the preprint here: https://arxiv.org/abs/2007.04637
+
 # Install dependencies
 ```
 conda env create -f py37_environment.yml
