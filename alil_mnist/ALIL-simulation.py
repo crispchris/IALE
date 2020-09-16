@@ -35,17 +35,13 @@ args = utils.get_args()
 logger = utils.init_logger()
 
 rootdir = args.root_dir
-EXPERIMENT_NAME = args.experiment_name
-DATASET_NAME = "alil_sim_" + EXPERIMENT_NAME + "_" + args.dataset_name
-
+DATASET_NAME = "alil_sim_" + args.dataset_name
 
 QUERY = args.query_strategy
 EPISODES = args.episodes
 timesteps = args.timesteps
-
-dataset = args.dataset_name # "MNIST" or "Fashion-MNIST"
 k_num = args.k
-EMBEDDING_SIZE = 128
+EMBEDDING_SIZE = 32
 # MNIST has 10 classes
 NUM_CLASSES = 10
 state_dim = 2 * EMBEDDING_SIZE + 2 * NUM_CLASSES
@@ -54,19 +50,15 @@ BUDGET = args.annotation_budget
 policyname = "{}/{}_policy.h5".format(args.output, DATASET_NAME)
 classifiername = "{}/{}_classifier.h5".format(args.output, DATASET_NAME)
 
-if dataset == "MNIST":
-    (train_data, train_labels), (test_data, test_labels) = mnist.load_data()
-elif dataset == "Fashion-MNIST":
-    (train_data, train_labels), (test_data, test_labels) = keras.datasets.fashion_mnist.load_data()
-else:
-    print("--dataset is either MNIST or Fashion-MNIST")
-    exit(1)
+
+(train_data, train_labels), (test_data, test_labels) = mnist.load_data()
 data = np.concatenate((train_data, test_data))
 logger.info("data pool {}".format(data.shape))
 labels = np.concatenate((train_labels, test_labels))
 data = data.reshape(data.shape[0], 28, 28, 1)
 # convert class vectors to binary class matrices
 labels = keras.utils.to_categorical(labels, NUM_CLASSES)
+
 allaccuracylist = []
 
 logger.info("Set TF configuration for {} gpus".format(K.tensorflow_backend._get_available_gpus()))
@@ -104,7 +96,6 @@ for tau in range(0, args.episodes):
     if args.initial_training_size > 0:
         model.fit(x_trn, y_trn, batch_size=args.classifier_batch_size, epochs=args.classifier_epochs, verbose=0)
     current_weights = model.get_weights()
-    logger.info("Saving model to{}".format(classifiername))
     model.save(classifiername)
 
     # toss a coint
@@ -144,7 +135,7 @@ for tau in range(0, args.episodes):
         state = getAState(x_trn, y_trn, x_rand_unl, model)
 
         # if head(>0.5), use the policy; else tail(<=0.5), use the expert
-        """ this coin is pi_tau = beta_tau * pi_star + (1-beta_tau) * pi_tau
+        """ ??? this coin is pi_tau = beta_tau * pi_star + (1-beta_tau) * pi_tau
             with coin-toss decide whether to use expert or learned_policy for dagger_data_collection
         """
         if (coin > 0.5):

@@ -14,7 +14,12 @@ class MCDropoutSampling(Strategy):
         super(MCDropoutSampling, self).__init__(dataset_pool, [], valid_dataset, test_dataset)
 
     def query(self, n, model, train_dataset, pool_dataset):
-        device = model.state_dict()['softmax.bias'].device
+        if prop.MODEL == "MLP":
+            device = 'cuda'
+        if prop.MODEL == "CNN":
+            device = model.state_dict()['softmax.bias'].device
+        if prop.MODEL == "RESNET18":
+            device = 'cuda'
 
         predictions = get_mc_pool_preds(model, device, pool_dataset)
         scores = variation_ratios(predictions)
@@ -34,7 +39,7 @@ def get_model_pool_preds(model, device, pool_dataset):
         for i, data in enumerate(pool_dataloader):
             inputs, labels = data[0].float(), data[1].long()
             inputs, labels = inputs.to(device), labels.to(device)
-            outputs = model(inputs)
+            outputs, embeddings = model(inputs)
             predictions.append(outputs)
     return torch.cat(predictions)
 

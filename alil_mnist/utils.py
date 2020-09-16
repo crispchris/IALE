@@ -68,11 +68,11 @@ def get_args():
                         help='Output folder')
     parser.add_argument('--test_set', nargs='?',
                         help='Test set path')
-    parser.add_argument('--validation_size', type=int, default=100,
+    parser.add_argument('--validation_size', type=int, default=10,
                         help='Number of data to leave out for validation in each episode')
     parser.add_argument('--label_data_size', type=int, default=200,
                         help='Number of labeled data. The rest will be treated as unlabel data in each episode')
-    parser.add_argument('--initial_training_size', type=int, default=20,
+    parser.add_argument('--initial_training_size', type=int, default=5,
                         help='Number of data point to initialize underlying model in dreaming phase')
     parser.add_argument('--policy_path', nargs='?',
                         help='policy path')
@@ -80,7 +80,7 @@ def get_args():
                         help='model path')
     parser.add_argument('--learning_phase_length', type=int, default=10,
                         help='number of datapoint to get annotation on ')
-    parser.add_argument('--k_fold', type=int, default=5,
+    parser.add_argument('--k_fold', type=int, default=10,
                         help='k - fold cross validation')
     parser.add_argument('--k_learning', type=int, default=5,
                         help='k value in active learning phase')
@@ -96,8 +96,7 @@ def get_args():
                         help='How to select candidate for dreaming: random, certainty, mix')
     parser.add_argument('--al_candidate_selection_mode', default="random",
                         help='How to select candidate in AL phase: random, uncertainty')
-    parser.add_argument('--experiment_name', default='Fashion-MNIST',
-                        help='datasets either MNIST or Fashion-MNIST')
+
     return parser.parse_args()
 
 

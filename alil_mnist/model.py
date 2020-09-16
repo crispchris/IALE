@@ -28,7 +28,7 @@ def getConv2DClassifier(input_shape, num_classes, learning_rate, embedding_size,
     model.add(Conv2D(32, kernel_size=(3, 3),
                      activation='relu',
                      input_shape=input_shape))
-    model.add(Conv2D(64, (3, 3), activation='relu'))
+    model.add(Conv2D(32, (3, 3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Dropout(0.25))
     model.add(Flatten())
@@ -54,22 +54,6 @@ def getConv2DClassifier(input_shape, num_classes, learning_rate, embedding_size,
 
 def getPolicy(k, state_dim):
     policy = Sequential()
-    policy.add(TimeDistributed(Dense(128,activation='relu'), input_shape=(k, state_dim)))
-    policy.add(TimeDistributed(Dense(128,activation='relu')))
-    policy.add(TimeDistributed(Dense(128, activation='relu')))
-    policy.add(TimeDistributed(Dense(1,activation='relu')))
-    policy.add(Reshape((k,), input_shape=(k, 1)))
-    policy.add(Activation('softmax'))
-    optimizer = optimizers.Adam(lr=1e-4)
-    policy.compile(loss='categorical_crossentropy',
-                   optimizer=optimizer,
-                   metrics=['mse', 'accuracy'])
-    policy.summary()
-    return policy
-"""
- original smaller policy:
-def getPolicy(k, state_dim):
-    policy = Sequential()
     policy.add(TimeDistributed(Dense(1), input_shape=(k, state_dim)))
     policy.add(Reshape((k,), input_shape=(k, 1)))
     policy.add(Activation('softmax'))
@@ -77,9 +61,8 @@ def getPolicy(k, state_dim):
     policy.compile(loss='categorical_crossentropy',
                    optimizer=optimizer,
                    metrics=['mse', 'accuracy'])
-    policy.summary()
     return policy
-"""
+
 
 # get the output of intermediate layer
 def get_intermediatelayer(model, layer, X_batch):
@@ -93,7 +76,7 @@ def getState(x_trn, y_trn, x_new, model):
         the candidate document represented by the convolutional net h(x)
         the distribution over the document’s class labels mφ(x)
         the sum of all document vector representations in the labeled set SUM_(x ∈ Data_labelled){ h(x) },
-        the sum of all document vectors in the random pool of unlabelled data SUM_(x ∈ D_pool) { h(x) },
+        the sum of all document vectors in the random pool of unlabelled data SUM_(x ∈ D_pool) { h(x) }, # TODO where is this?
         the empirical rnd distribution of class labels in the labeled dataset.
     """
 

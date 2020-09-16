@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 import math
-
+import properties as prop
 
 def padding_same(kernel_size):
     return math.ceil((kernel_size - 1) / 2)
@@ -13,24 +13,27 @@ model_params = {
     'fc2_dropout': 0.5
 }
 
-NUM_CHANNELS = 1
+NUM_CHANNELS = prop.CHANNELS
 NUM_CLASSES = 10
 
 
 class CNN(nn.Module):
     def __init__(self):
         super(CNN, self).__init__()
-
+        self.embedding_size = 128
         self.mode_training = False
         self.conv1 = nn.Conv2d(NUM_CHANNELS, 32, 4, padding=padding_same(4))
         self.conv2 = nn.Conv2d(32, 32, padding_same(4))
-        self.fc1 = nn.Linear(6272, 128) #self.fc1 = nn.Linear(3872, 128)
-        self.softmax = nn.Linear(128, NUM_CLASSES)
+        self.fc1 = nn.Linear(prop.TO_EMBEDDING, self.embedding_size) #self.fc1 = nn.Linear(3872, 128)
+        self.softmax = nn.Linear(self.embedding_size, NUM_CLASSES)
+
+    def get_embedding_dim(self):
+        return self.embedding_size
 
     def forward(self, x):
-        x = self.common_code(x)
-        x = self.softmax(x)
-        return x
+        e1 = self.common_code(x)
+        x = self.softmax(e1)
+        return x, e1
 
     def common_code(self, x):
         x = F.relu(self.conv1(x))

@@ -5,35 +5,27 @@ Created on Wed Jun 28 10:40:41 2017
 @author: lming
 """
 import utils
-#utils.tensorflow_shutup()
-
-import keras
-from keras.backend.tensorflow_backend import set_session
-from keras import backend as K
-import tensorflow as tf
-config = tf.ConfigProto()
-config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
-sess = tf.Session(config=config)
-set_session(sess)  # set this TensorFlow session as the default session for Keras
-
+utils.tensorflow_shutup()
 import gc
 from queryStrategy import *
 from model import *
 
 import numpy as np
 
+import keras
+import tensorflow as tf
 from keras import backend as K
 
 from keras.datasets import mnist
+from keras.backend.tensorflow_backend import set_session
 
 args = utils.get_args()
 logger = utils.init_logger()
-logger.info("Set TF configuration for {} gpus".format(K.tensorflow_backend._get_available_gpus()))
 
 rootdir = args.root_dir
 DATASET_NAME = "al_baseline_" + args.query_strategy + "_" + args.dataset_name
 NUM_CLASSES = 10
-EMBEDDING_SIZE = 128
+EMBEDDING_SIZE = 32
 LEARNING_RATE = 1e-3
 
 QUERY = args.query_strategy
@@ -55,7 +47,12 @@ labels = keras.utils.to_categorical(labels, NUM_CLASSES)
 
 allaccuracylist = []
 
-
+logger.info("Set TF configuration for {} gpus".format(K.tensorflow_backend._get_available_gpus()))
+num_gpus = len(K.tensorflow_backend._get_available_gpus())
+if num_gpus > 0:
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    set_session(tf.Session(config=config))
 
 for r in range(0, args.timesteps):
     accuracylist = []

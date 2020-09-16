@@ -17,3 +17,4 @@ def read_results(prefix='', results_file=prop.RESULTS_FILE):
 def set_results(results, results_file=prop.RESULTS_FILE):
     with open(results_file, 'w') as f:
         json.dump(results, f)
+

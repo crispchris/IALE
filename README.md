@@ -1,11 +1,11 @@
-# Publication
+# IALE: Imitating Active Learner Ensembles
 
 You can find the preprint here: https://arxiv.org/abs/2007.04637
 
 ```
 @misc{lffler2020iale,
     title={IALE: Imitating Active Learner Ensembles},
-    author={Christoffer Löffler and Karthik Ayyalasomayajula and Sascha Riechel and Christopher Mutschler},
+    author={Christoffer Löffler and Christopher Mutschler},
     year={2020},
     eprint={2007.04637},
     archivePrefix={arXiv},
@@ -13,29 +13,40 @@ You can find the preprint here: https://arxiv.org/abs/2007.04637
 }
 ```
 
+Parts of this code are from [Jordan Ash' BADGE](https://github.com/JordanAsh/badge), [Kuan-Hao Huang's deep active learning repository](https://github.com/ej0cl6/deep-active-learning) or [Ming Liu's ALIL](https://github.com/Grayming/ALIL).
+
 # Install dependencies
 ```
-conda env create -f py37_environment.yml
+conda env create -f environment.yml
 ```
 
 # Test submitted weights
 ```
-conda activate py37
+conda activate iale
+python active_learn.py
+```
+
+# Plot results
+```
+conda activate iale
 jupyter notebook
-execute all cells in run_active_learn.ipynb
+Experiments.ipynb
 ```
 
-# Train policy
+# Train a policy
 ```
-conda activate py37
+conda activate iale
 python train_policy.py
-``` 
+```
 
+# Visualize datasets
+```
+conda activate iale
+jupyter notebook
+Visualize_Datasets.ipynb
+```
 
 # Train and test ALIL baseline
-
-The original code authors mentioned in the source files of the ALIL approach are not us, but we modified it.
-
 ```
 conda activate py37
 cd alil_mnist

@@ -1,5 +1,7 @@
 import torch
 from models.CNN import CNN
+from models.MLP import mlpMod as MLP
+import models.resnet
 from models.model_helpers import weights_init
 from torch.utils.data import DataLoader
 from train_helper import train_validate_model
@@ -17,15 +19,24 @@ class EnsembleSampling(Strategy):
         super(EnsembleSampling, self).__init__(dataset_pool, [], valid_dataset, test_dataset)
 
     def query(self, n, model, train_dataset, pool_dataset, num_ensembles=5):
-        device = model.state_dict()['softmax.bias'].device
+        if prop.MODEL == "CNN":
+            device = model.state_dict()['softmax.bias'].device
+        if prop.MODEL == "RESNET18":
+            device = 'cuda'
+        if prop.MODEL == "MLP":
+            device = 'cuda'
 
         predictions = []
-
         predictions.append(get_model_pool_preds(model, device, pool_dataset))
 
         ensemble_acc = []
         for i in range(1, num_ensembles):
-            model = CNN().apply(weights_init).to(device)
+            if prop.MODEL == "MLP":
+                model = MLP().apply(weights_init).to(device)
+            if prop.MODEL == "CNN":
+                model = CNN().apply(weights_init).to(device)
+            if prop.MODEL == "RESNET18":
+                model = models.resnet.ResNet18().to(device)
             test_acc = train_validate_model(model, device, train_dataset, self.valid_dataset, self.test_dataset)
             ensemble_acc.append(test_acc)
             predictions.append(get_model_pool_preds(model, device, pool_dataset))
@@ -50,6 +61,6 @@ def get_model_pool_preds(model, device, pool_dataset):
         for i, data in enumerate(pool_dataloader):
             inputs, labels = data[0].float(), data[1].long()
             inputs, labels = inputs.to(device), labels.to(device)
-            outputs = model(inputs)
+            outputs, embeddings = model(inputs)
             predictions.append(outputs)
     return torch.cat(predictions)
