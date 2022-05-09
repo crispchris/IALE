@@ -57,7 +57,6 @@ logger.info(" * Classifier file: {}".format(args.model_path))
 logger.info(" * OUTPUT file: {}".format(resultname))
 
 
-# TODO get a dataset other than MNIST, i.e. FashionMNIST
 ###########
 (train_data, train_labels), (test_data, test_labels) = mnist.load_data()
 data = np.concatenate((train_data, test_data))

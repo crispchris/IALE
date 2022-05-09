@@ -14,6 +14,7 @@ from torch.autograd import Variable
 import properties as prop
 
 NUM_CHANNELS = prop.CHANNELS
+NUM_CLASSES = prop.NUM_CLASSES
 
 class BasicBlock(nn.Module):
     expansion = 1
@@ -81,7 +82,7 @@ class ResNet(nn.Module):
         self.layer2 = self._make_layer(block, 32, num_blocks[1], stride=2)
         self.layer3 = self._make_layer(block, 64, num_blocks[2], stride=2)
         self.layer4 = self._make_layer(block, 128, num_blocks[3], stride=2)
-        self.linear = nn.Linear(128 * block.expansion, 10)
+        self.linear = nn.Linear(128 * block.expansion, NUM_CLASSES)
     def _make_layer(self, block, planes, num_blocks, stride):
         strides = [stride] + [1]*(num_blocks-1)
         layers = []

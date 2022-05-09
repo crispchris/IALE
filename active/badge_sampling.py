@@ -40,7 +40,6 @@ from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted
 from sklearn.utils.validation import FLOAT_DTYPES
 from sklearn.metrics.pairwise import rbf_kernel as rbf
-from sklearn.externals.six import string_types
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.metrics import pairwise_distances
 
@@ -51,7 +50,7 @@ def init_centers(X, K):
     indsAll = [ind]
     centInds = [0.] * len(X)
     cent = 0
-    print('#Samps\tTotal Distance')
+    #print('#Samps\tTotal Distance')
     while len(mu) < K:
         if len(mu) == 1:
             D2 = pairwise_distances(X, mu).ravel().astype(float)
@@ -61,7 +60,7 @@ def init_centers(X, K):
                 if D2[i] >  newD[i]:
                     centInds[i] = cent
                     D2[i] = newD[i]
-        print(str(len(mu)) + '\t' + str(sum(D2)), flush=True)
+        #print(str(len(mu)) + '\t' + str(sum(D2)), flush=True)
         D2 = D2.ravel().astype(float)
         Ddist = (D2 ** 2)/ sum(D2 ** 2)
         customDist = stats.rv_discrete(name='custm', values=(np.arange(len(D2)), Ddist))

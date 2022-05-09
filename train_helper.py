@@ -92,7 +92,7 @@ def train_policy_one_epoch(epoch, model, device, optimizer, all_states, all_acti
         train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=prop.TRAIN_BATCH, shuffle=True)
         criterion = nn.BCELoss(reduction='none')
     if prop.CLUSTERING_AUX_LOSS_HEAD:
-        # FIXME make state/auxlosscluster dataset
+        # not implemented
         train_dataset = StateActionActionDataset(actions=all_actions, states=all_states)
         train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=prop.TRAIN_BATCH, shuffle=True)
         criterion = nn.BCELoss(reduction='none')

@@ -5,10 +5,9 @@ from active.core_set_alt import CoreSet as CoreSetAltSampling
 from active.badge_sampling import BadgeSampling
 from active.entropy_sampling import EntropySampling
 from active.least_confidence import LeastConfidence as LeastConfidenceSampling
+from active.random import RandomSampling
 import logging
-import numpy as np
 import torch
-from torch.utils.data import TensorDataset
 from tqdm import trange
 from models.Policy import Policy
 from models.model_helpers import weights_init
@@ -19,6 +18,7 @@ import torch.multiprocessing as mp
 from train_helper import reinit_seed
 
 if __name__ == '__main__':
+    prop.NUM_CLASSES = 10  # adapt this for other datasets
     torch.cuda.cudnn_enabled = False
     reinit_seed(prop.RANDOM_SEED)
     mp.set_start_method('spawn')
@@ -26,10 +26,11 @@ if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     pathlib.Path(prop.POLICY_FOLDER).mkdir(parents=True, exist_ok=True)  # make policy save directories
     assert(prop.CLUSTER_EXPERT_HEAD + prop.CLUSTERING_AUX_LOSS_HEAD + prop.SINGLE_HEAD == 1)
-    oneHeadStrategies = [MCDropoutSampling, EnsembleSampling, EntropySampling, LeastConfidenceSampling,
-                         CoreSetAltSampling, BadgeSampling]
+    oneHeadStrategies = [MCDropoutSampling, EnsembleSampling, EntropySampling, LeastConfidenceSampling, CoreSetAltSampling, BadgeSampling]
+    #oneHeadStrategies = [RandomSampling for i in range(0, prop.NUM_OF_RANDOM_EXPERTS)]
     policy = Policy().apply(weights_init)
     all_states, all_actions = [], []
+    logging.info(f"Using dataset {prop.DATASET}")
     t = trange(0, prop.NUM_EPISODES, desc="Episode".format(prop.ACQ_SIZE), leave=True)
     for episode in t:
         logging.warning("Starting episode {}, storing to {}".format(episode + 1, prop.POLICY_FOLDER))

@@ -34,8 +34,7 @@ class LeastConfidence(Strategy):
         dataloader = DataLoader(pool_dataset, batch_size=prop.VAL_BATCH, shuffle=False, num_workers=0)
         model.eval()
         Y = pool_dataset[:][1]
-        # FIXME hardcoded number of classes
-        probs = [] #torch.zeros([len(Y), 10])
+        probs = []
         with torch.no_grad():
             for x, y in dataloader:
                 x, y = Variable(x.cuda()), Variable(y.cuda())

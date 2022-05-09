@@ -1,15 +1,17 @@
 # IALE: Imitating Active Learner Ensembles
 
-You can find the preprint here: https://arxiv.org/abs/2007.04637
+You can find the paper here: https://www.jmlr.org/papers/v23/21-0387.html
 
 ```
-@misc{lffler2020iale,
-    title={IALE: Imitating Active Learner Ensembles},
-    author={Christoffer Löffler and Christopher Mutschler},
-    year={2020},
-    eprint={2007.04637},
-    archivePrefix={arXiv},
-    primaryClass={cs.LG}
+@article{JMLR:v23:21-0387,
+  author  = {Christoffer Löffler and Christopher Mutschler},
+  title   = {IALE: Imitating Active Learner Ensembles},
+  journal = {Journal of Machine Learning Research},
+  year    = {2022},
+  volume  = {23},
+  number  = {107},
+  pages   = {1-29},
+  url     = {http://jmlr.org/papers/v23/21-0387.html}
 }
 ```
 

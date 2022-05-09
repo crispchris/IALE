@@ -1,7 +1,3 @@
-import copy
-import logging
-import numpy as np
-import torch
 from tqdm import trange
 import properties as prop
 from data.data_helpers import make_tensordataset, stratified_split_dataset, concat_datasets
@@ -11,49 +7,26 @@ import models.resnet
 from models.model_helpers import weights_init
 from train_helper import train_validate_model, reinit_seed
 from active.policy_helpers import get_state_action
-from data.mnist import get_policy_training_splits
 
-import numpy as np
-from torch.utils.data import DataLoader
-from active.strategy import Strategy
-import pickle
-from scipy.spatial.distance import cosine
-import sys
-import gc
-from scipy.linalg import det
-from scipy.linalg import pinv as inv
-from copy import copy as copy
+if prop.DATASET.lower() == "mnist":
+    from data.mnist import get_policy_training_splits
+elif prop.DATASET.lower() == "fmnist":
+    from data.fmnist import get_policy_training_splits
+elif prop.DATASET.lower() == "kmnist":
+    from data.kmnist import get_policy_training_splits
+elif prop.DATASET.lower() == "cifar10":
+    from data.cifar10 import get_policy_training_splits
+elif prop.DATASET.lower() == "cifar100":
+    from data.cifar100 import get_policy_training_splits
+elif prop.DATASET.lower() == "svhn":
+    from data.svhn import get_policy_training_splits
+elif prop.DATASET.lower() == "emnist":
+    from data.emnist import get_policy_training_splits
+#from data.mnist import get_policy_training_splits
 from copy import deepcopy as deepcopy
 import torch
-from torch import nn
-import torchfile
-from torch.autograd import Variable
-import torch.optim as optim
-from torch.nn import functional as F
-import argparse
-import torch.nn as nn
-from collections import OrderedDict
-from scipy import stats
-import time
 import numpy as np
-import scipy.sparse as sp
-from itertools import product
-from sklearn.base import BaseEstimator, ClusterMixin, TransformerMixin
-from sklearn.metrics.pairwise import euclidean_distances
-from sklearn.metrics.pairwise import pairwise_distances_argmin_min
-from sklearn.utils.extmath import row_norms, squared_norm, stable_cumsum
-from sklearn.utils.sparsefuncs_fast import assign_rows_csr
-from sklearn.utils.sparsefuncs import mean_variance_axis
-from sklearn.utils.validation import _num_samples
-from sklearn.utils import check_array
-from sklearn.utils import gen_batches
-from sklearn.utils import check_random_state
-from sklearn.utils.validation import check_is_fitted
-from sklearn.utils.validation import FLOAT_DTYPES
-from sklearn.metrics.pairwise import rbf_kernel as rbf
-from sklearn.externals.six import string_types
-from sklearn.exceptions import ConvergenceWarning
-from sklearn.metrics import pairwise_distances
+
 
 def expert(acq_num, model, init_weights, strategies, train_dataset, pool_subset, valid_dataset, test_dataset, device):
     strategy_queries = []
@@ -72,14 +45,13 @@ def expert(acq_num, model, init_weights, strategies, train_dataset, pool_subset,
         strategy_queries.append(sel_ind)
 
     sel_strategy = strategy_acc.index(max(strategy_acc))
-    #logging.info("Expert for {} acquisition is {} sampling with model acccuracy {}".format(acq_num, strategies[
-    #    sel_strategy].name, strategy_acc))
-    return strategy_queries[sel_strategy]
+    print("Expert for {} acquisition is {} sampling with model acccuracy {}".format(acq_num, strategies[sel_strategy].name, strategy_acc))
+    return strategy_queries[sel_strategy], strategy_acc, strategy_queries
 
 
 def run_episode(strategies, policy, beta, device, num_worker):
     states, actions = [], []
-    # FIXME set random seed to 0 reinit_seed(num_worker)  # all strategies use same initial training data and model weights
+    # all strategies use same initial training data and model weights
     reinit_seed(prop.RANDOM_SEED)
     if prop.MODEL == "MLP":
         model = MLP().apply(weights_init).to(device)
@@ -137,7 +109,7 @@ def run_episode(strategies, policy, beta, device, num_worker):
             sel_ind = expert(acq_num, model, init_weights, my_strategies, train_dataset, pool_subset, valid_dataset,
                              test_dataset, device)
             state, action = get_state_action(model, train_dataset, pool_subset, sel_ind=sel_ind, clustering=None)
-            # FIXME add clustering
+            # not implemented
 
         states.append(state)
         actions.append(action)
@@ -154,7 +126,7 @@ def run_episode(strategies, policy, beta, device, num_worker):
                     uncertainty_selection = torch.topk(policy_output_uncertainty.reshape(prop.K), int(prop.ACQ_SIZE/2.0))[1].cpu().numpy()
                     sel_ind = (uncertainty_selection, diversity_selection)
                 if prop.CLUSTERING_AUX_LOSS_HEAD:
-                    # FIXME clustering outputs?
+                    # not implemented
                     policy_outputs = policy(state.to(device)).flatten()
                     sel_ind = torch.topk(policy_outputs, prop.ACQ_SIZE)[1].cpu().numpy()
 

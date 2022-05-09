@@ -9,7 +9,6 @@ from collections import Counter
 # Inspired by https://github.com/ej0cl6/deep-active-learning/blob/master/query_strategies/random_sampling.py
 class Strategy:
     def __init__(self, dataset_pool, idxs_lb, valid_dataset, test_dataset):
-        # self.pool_indices = np.array([])
         self.dataset_pool = dataset_pool
         self.valid_dataset = valid_dataset
         self.test_dataset = test_dataset
@@ -23,9 +22,6 @@ class Strategy:
 
     def query(self, **kwargs):
         pass
-    #
-    # def sample_pool(self, indices):
-    #     self.pool_indices = indices
 
     def update(self, idxs_lb):
         self.idxs_lb = idxs_lb
@@ -65,10 +61,7 @@ class Strategy:
 
     def get_handler(self, handler_type):
         if "pool" in handler_type:
-            # if self.pool_indices.size == 0:
             dataset = self.make_tensordataset(self.dataset_pool, ~self.idxs_lb)
-            # else:
-            #     dataset = self.make_tensordataset(self.dataset_pool, self.pool_indices)
         elif "train" in handler_type:
             dataset = self.make_tensordataset(self.dataset_pool, self.idxs_lb)
 

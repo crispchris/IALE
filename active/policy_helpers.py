@@ -37,7 +37,6 @@ from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted
 from sklearn.utils.validation import FLOAT_DTYPES
 from sklearn.metrics.pairwise import rbf_kernel as rbf
-from sklearn.externals.six import string_types
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.metrics import pairwise_distances
 import torch
@@ -64,7 +63,6 @@ def get_state_action(model, train_dataset, pool_subset, un_sel_ind=None, di_sel_
     if prop.CLUSTERING_AUX_LOSS_HEAD:
         action = torch.tensor([1 if ind in sel_ind else 0 for ind in range(state.shape[0])])
         clustering = torch.tensor(clustering)
-        # FIXME implement
         return state, (action, clustering)
 
 
@@ -89,7 +87,6 @@ def get_state(model, device, pool_dataset, train_dataset):
             train_pred_lab_unique_cnts = new_tuple
     sorted_uniques_cnts = sort_together([train_pred_lab_unique_cnts[0], train_pred_lab_unique_cnts[1]])
     train_pred_label_statistics = torch.Tensor(sorted_uniques_cnts[1] / sum(sorted_uniques_cnts[1]))
-    #train_pred_label_statistics = torch.bincount(train_predictions).float() / len(train_predictions)
 
     state = []
     if prop.ADD_POOL_MEAN_EMB:
@@ -100,7 +97,11 @@ def get_state(model, device, pool_dataset, train_dataset):
                                     train_label_statistics,
                                     train_pred_label_statistics,
                                     get_one_hot(pool_predictions[ind])]))
-    if prop.ADD_GRADIENT_EMBEDDING and prop.ADD_PREDICTIONS and not prop.ADD_POOL_MEAN_EMB:
+    if prop.ADD_GRADIENT_EMBEDDING and not prop.ADD_PREDICTIONS and not prop.ADD_POOL_MEAN_EMB and prop.ARBITRARY_CLASSES:
+        for ind, sample_emb in enumerate(pool_embeddings):
+            state.append(torch.cat([lab_emb,
+                                    gradient_embeddings[ind]]))
+    if prop.ADD_GRADIENT_EMBEDDING and prop.ADD_PREDICTIONS and not prop.ADD_POOL_MEAN_EMB and not prop.ARBITRARY_CLASSES:
         for ind, sample_emb in enumerate(pool_embeddings):
             state.append(torch.cat([lab_emb,
                                     sample_emb,
@@ -108,22 +109,19 @@ def get_state(model, device, pool_dataset, train_dataset):
                                     train_pred_label_statistics,
                                     gradient_embeddings[ind],
                                     get_one_hot(pool_predictions[ind])]))
-    if prop.ADD_GRADIENT_EMBEDDING and not prop.ADD_PREDICTIONS and not prop.ADD_POOL_MEAN_EMB:
+    if prop.ADD_GRADIENT_EMBEDDING and not prop.ADD_PREDICTIONS and not prop.ADD_POOL_MEAN_EMB and  not prop.ARBITRARY_CLASSES:
         for ind, sample_emb in enumerate(pool_embeddings):
             state.append(torch.cat([lab_emb,
                                     train_label_statistics,
                                     train_pred_label_statistics,
                                     gradient_embeddings[ind]]))
-    if prop.ADD_PREDICTIONS and not prop.ADD_GRADIENT_EMBEDDING and not prop.ADD_POOL_MEAN_EMB:
+    if prop.ADD_PREDICTIONS and not prop.ADD_GRADIENT_EMBEDDING and not prop.ADD_POOL_MEAN_EMB and  not prop.ARBITRARY_CLASSES:
         for ind, sample_emb in enumerate(pool_embeddings):
             state.append(torch.cat([lab_emb,
                                     sample_emb,
                                     train_label_statistics,
                                     train_pred_label_statistics,
                                     get_one_hot(pool_predictions[ind])]))
-    for s in state:
-        if s.shape[0] == 1565:
-            print("state is too small")
     return torch.stack(state)
 
 
@@ -135,12 +133,11 @@ def get_one_hot(label):
 def get_model_gradient_embeddings(model, device, pool_dataset):
     embDim = model.get_embedding_dim()
     model.eval()
-    # hardcode 10 classes for F/K/MNIST
+    # FIXME hardcode 10 classes for F/K/MNIST
     nLab = 10  # len(np.unique(Y))
     embedding = np.zeros([len(pool_dataset), embDim * nLab])
 
     dataloader = torch.utils.data.DataLoader(pool_dataset, batch_size=len(pool_dataset), shuffle=False)
-    #dataloader = torch.utils.data.DataLoader(pool_dataset, batch_size=10000, shuffle=False)
     with torch.no_grad():
         for idxs, data in enumerate(dataloader):
             x = data[0].float()

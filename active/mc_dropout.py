@@ -14,11 +14,12 @@ class MCDropoutSampling(Strategy):
         super(MCDropoutSampling, self).__init__(dataset_pool, [], valid_dataset, test_dataset)
 
     def query(self, n, model, train_dataset, pool_dataset):
-        if prop.MODEL == "MLP":
+        device = 'cuda'
+        if prop.MODEL.lower() == "MLP".lower():
             device = 'cuda'
-        if prop.MODEL == "CNN":
+        if prop.MODEL.lower() == "CNN".lower():
             device = model.state_dict()['softmax.bias'].device
-        if prop.MODEL == "RESNET18":
+        if prop.MODEL.lower() == "RESNET18".lower():
             device = 'cuda'
 
         predictions = get_mc_pool_preds(model, device, pool_dataset)

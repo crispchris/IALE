@@ -1,11 +1,11 @@
-from torchvision.datasets import FashionMNIST
+from torchvision.datasets import EMNIST
 from torch.utils.data import TensorDataset
 from data.data_helpers import split_dataset, stratified_split_dataset
 import properties as prop
 import pwd, os
 from data.data_helpers import split_dataset, concat_datasets
 
-DATA_PATH = pwd.getpwuid(os.getuid()).pw_dir + '/time_series_data/fMNIST'
+DATA_PATH = pwd.getpwuid(os.getuid()).pw_dir + '/time_series_data/eMNIST'
 
 
 def transform_data(data):
@@ -13,20 +13,16 @@ def transform_data(data):
     return data
 
 
-train_dataset = FashionMNIST(DATA_PATH, train=True, download=True)
-trainX, trainy = transform_data(train_dataset.data), train_dataset.targets
+train_dataset = EMNIST(DATA_PATH, split='letters', train=True, download=True) # alternatives: letters, balanced
+trainX, trainy = transform_data(train_dataset.data), (train_dataset.targets-1)
 
-#validation_dataset, train_dataset = split_dataset(TensorDataset(trainX, trainy), prop.VAL_SIZE)
-#trainX, trainy = train_dataset.tensors[0], train_dataset.tensors[1]
 
 train_dataset = TensorDataset(trainX, trainy)
 
-# train_size = 2000
-# train_dataset, _ = split_dataset(train_dataset, train_size)
 
 ################ test dataset ################################
-test_dataset = FashionMNIST(DATA_PATH, train=False, download=True)
-testX, testy = transform_data(test_dataset.data), test_dataset.targets
+test_dataset = EMNIST(DATA_PATH, split='letters', train=False, download=True) # alternatives: letters, balanced
+testX, testy = transform_data(test_dataset.data), (test_dataset.targets-1)
 
 test_dataset = TensorDataset(testX, testy)
 full_dataset = concat_datasets(train_dataset, test_dataset)
@@ -34,8 +30,6 @@ full_dataset = concat_datasets(train_dataset, test_dataset)
 
 def get_data_splits():
     validation_dataset, split_train_dataset = split_dataset(train_dataset, prop.VAL_SIZE)
-    # train_size = 2000
-    # split_train_dataset, _ = split_dataset(split_train_dataset, train_size)
     return split_train_dataset, validation_dataset, test_dataset
 
 

@@ -9,7 +9,7 @@ import logging
 
 
 class PolicyLearner(Strategy):
-    name = 'IALEv2_' + str(prop.state) + "-" + str(prop.EXPERTS)
+    name = 'IALE_' + str(prop.state) + "-" + str(prop.EXPERTS)
 
     def __init__(self, dataset_pool, idxs_lb, valid_dataset, test_dataset, device='cuda', policy_file=None):
         super(PolicyLearner, self).__init__(dataset_pool, idxs_lb, valid_dataset, test_dataset)
@@ -27,11 +27,11 @@ class PolicyLearner(Strategy):
         self.policy.eval()
 
     def query(self, n, model, train_dataset, pool_dataset):
-        if prop.MODEL == "MLP":
+        if prop.MODEL.lower() == "mlp":
             device = 'cuda'
-        if prop.MODEL == "CNN":
+        if prop.MODEL.lower() == "cnn":
             device = model.state_dict()['softmax.bias'].device
-        if prop.MODEL == "RESNET18":
+        if prop.MODEL.lower() == "resnet18":
             device = 'cuda'
 
         state = get_state(model, device, pool_dataset, train_dataset)
@@ -41,7 +41,6 @@ class PolicyLearner(Strategy):
                 policy_outputs = []
                 for i, data in enumerate(state_dataloader):
                     inputs = data.float().to(device)
-                    # FIXME predict only one selection score
                     outputs = self.policy(inputs)
                     policy_outputs.append(outputs)
                 policy_outputs = torch.cat(policy_outputs).cpu().flatten()
@@ -66,7 +65,7 @@ class PolicyLearner(Strategy):
             remaining_ind = list(set(np.arange(len(pool_dataset))) - set(sel_ind))
             return sel_ind, remaining_ind
         if prop.CLUSTERING_AUX_LOSS_HEAD:
-            # FIXME predict selection and clustering
+            # not implemented
             return sel_ind, remaining_ind
 
 

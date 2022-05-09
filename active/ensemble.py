@@ -19,11 +19,12 @@ class EnsembleSampling(Strategy):
         super(EnsembleSampling, self).__init__(dataset_pool, [], valid_dataset, test_dataset)
 
     def query(self, n, model, train_dataset, pool_dataset, num_ensembles=5):
-        if prop.MODEL == "CNN":
+        device = 'cuda'
+        if prop.MODEL.lower() == "CNN".lower():
             device = model.state_dict()['softmax.bias'].device
-        if prop.MODEL == "RESNET18":
+        if prop.MODEL.lower() == "RESNET18".lower():
             device = 'cuda'
-        if prop.MODEL == "MLP":
+        if prop.MODEL.lower() == "MLP".lower():
             device = 'cuda'
 
         predictions = []

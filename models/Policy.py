@@ -23,7 +23,7 @@ class Policy(nn.Module):
             self.fc_di = nn.Linear(128, 1)
             self.sigmoid_di = nn.Sigmoid()
         if prop.CLUSTERING_AUX_LOSS_HEAD:
-            # FIXME add clustering head
+            # not implemented
             self.fc = nn.Linear(128, 1)
             self.sigmoid = nn.Sigmoid()
             self.fc_clustering = nn.Linear(128, 1)
@@ -44,7 +44,7 @@ class Policy(nn.Module):
         if prop.CLUSTERING_AUX_LOSS_HEAD:
             score = self.fc_un(embedding)
             score = self.sigmoid_un(score)
-            # FIXME make this aux clustering
+            # not implemented
             clustering = self.fc_di(embedding)
             clustering = self.sigmoid_di(clustering)
             return score, clustering

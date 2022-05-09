@@ -76,7 +76,7 @@ def getState(x_trn, y_trn, x_new, model):
         the candidate document represented by the convolutional net h(x)
         the distribution over the document’s class labels mφ(x)
         the sum of all document vector representations in the labeled set SUM_(x ∈ Data_labelled){ h(x) },
-        the sum of all document vectors in the random pool of unlabelled data SUM_(x ∈ D_pool) { h(x) }, # TODO where is this?
+        the sum of all document vectors in the random pool of unlabelled data SUM_(x ∈ D_pool) { h(x) },
         the empirical rnd distribution of class labels in the labeled dataset.
     """
 

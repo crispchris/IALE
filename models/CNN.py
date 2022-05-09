@@ -14,7 +14,7 @@ model_params = {
 }
 
 NUM_CHANNELS = prop.CHANNELS
-NUM_CLASSES = 10
+NUM_CLASSES = prop.NUM_CLASSES
 
 
 class CNN(nn.Module):
